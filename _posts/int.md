@@ -122,3 +122,103 @@ categories: 三维重建
 * 判断线段是否和直线相交
   > 用向量的叉乘
   
+
+---
+## 京东
+
+**代码**
+> 第一题：体测，小红跑1000米，一圈400米，知道自己跑多少米 dis，知道剩下的n-1个同学完成的圈数，求可能的最好名次和最差名次
+3 500
+1 2
+输出
+2 3
+
+思路：我当时的结果是85%的AC。看自己第几圈，如果有人跑的比你多圈，那一定最好的会下降一名，最坏的也下降一名， 如果跟自己同圈，最坏的下降一名。
+
+```
+def main():
+    n,dis = tuple(map(int,input().split()))
+    l = list(map(int,input().split()))
+    if dis==1000:
+        print(1,1)
+    quan = dis/400
+    best=1
+    worst=1
+    for i in range(n-1):
+        if l[i]>quan:
+            best+=1
+            worst+=1
+        elif l[i]==int(quan):
+            worst+=1
+    print(best,worst)
+main()
+```
+
+>第二题AC：给你n个数（可能重复），让你分为k个子集，使得这k个子集的最大差值的和最大
+5 3
+1 2 3 4 5
+输出
+6
+分成 {1,5} {2,4} {3}即可 4+2+0
+
+思路：将整个数组排序，然后左右各取一个组成k组，剩下的扔掉。需要注意的是，要用long而不是int，不然会内存溢出。我最终的通过率比较低，只有50%，应该和没有用long有很大关系。
+
+```
+from collections import deque
+def main():
+    n,k = tuple(map(int,input().split()))
+    a = list(map(int,input().split()))
+    dis =0
+    a.sort()
+    a=deque(a)
+    for i in range(k,0,-1):
+        if len(a)> i:
+            m1=a.popleft()
+            m2 =a.pop()
+            dis+=m2-m1
+        else:
+            break
+    print(dis)
+main()
+```
+
+
+
+
+>第三题AC：比较有意思，没做过，博弈。小A和小B拿到两个正整数x,y，他俩可以轮流对x+=1或x*=2，小A先手，谁的操作使得x>=y就算谁赢，小A赢则输出kou,否则输出yukari
+t组数据
+3
+15 17
+4 9
+2 9
+输出
+kou
+yukari
+kou
+
+思路：2 9 可以先x2，给B，无论怎样都输。最开始想用回溯，后来觉得DP可能更好。首先y/2以上的数字先手方一定赢dp[i]=0;逐个减一，如果拿到的数字是j，那如果+1和x2都会让先手方赢 （操作一次就变成对方先手了），那我必输，dp[j]=1即后手方必赢；同理，只要+1和x2有一个让后手必赢，那可以进行一次操作让自己变成后手，即dp[j]=0，其他情况不确定归-1.
+最后看dp[x]是不是0
+
+```
+from math import *
+a=['kou','yukari']
+def main():
+    t = int(input())
+    for _ in range(t):
+        x,y = tuple(map(int,input().split()))
+        dp=[-1]*(y+1)
+        for i in range(ceil(y/2),y):
+            dp[i]=0#先手胜利
+        for j in range(ceil(y/2)-1,0,-1):
+            if dp[j+1]==0 and dp[j*2]==0:
+                dp[j]=1
+            elif dp[j+1]==1 or dp[j*2] ==1:
+                dp[j]=0
+            else:
+                continue
+        if dp[x]==0:
+            print(a[0])
+        else:
+            print(a[1])
+main()
+```
